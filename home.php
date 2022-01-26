@@ -1,4 +1,31 @@
+<?php
 
+require "dbBroker.php";
+require "model/prijava.php";
+
+
+session_start();
+
+if(!isset($_SESSION['user_id'])){
+    header("Location: index.php");
+    exit();
+}
+
+$podaci = Prijava::getAll($conn);
+
+if(!$podaci){
+    echo "Nastala je greska pri preuzimanju podataka";
+    die();
+}
+
+if($podaci->num_rows == 0){
+    echo "Nema prijava";
+    die();
+}else{
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +73,11 @@
             </tr>
             </thead>
             <tbody>
-  
+            <?php
+                while($red = $podaci->fetch_array()):
+            
+            ?>
+
                 <tr>
                     <td><?php echo $red["predmet"] ?></td>
                     <td><?php echo $red["katedra"] ?></td>
@@ -61,6 +92,11 @@
 
                 </tr>
        
+                <?php
+                endwhile;
+                //ovde zatvaramo else granu
+            }
+                ?>
             </tbody>
         </table>
         <div class="row" >
@@ -70,7 +106,7 @@
             </div>
 
             <div class="col-md-12" style="text-align: right">
-                <button id="btn-obrisi" class="btn btn-danger" style="background-color: red; border: 1px solid white;">Obrisi</button>
+                <button id="btn-obrisi" formmethod="post" class="btn btn-danger" style="background-color: red; border: 1px solid white;">Obrisi</button>
             </div>
 
             <div class="col-md-2" style="text-align: right>; color:" >
@@ -84,7 +120,7 @@
 <!-- Modal -->
 <div class="modal fade" id="myModal" role="dialog" >
     <div class="modal-dialog">
-
+            
         <!--Sadrzaj modala-->
         <div class="modal-content" >
             <div class="modal-header">
